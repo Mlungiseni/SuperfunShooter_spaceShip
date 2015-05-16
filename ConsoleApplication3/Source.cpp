@@ -1,99 +1,84 @@
-#include "SpaceShip.h"
+#include "GameObject.h"
 
-SpaceShip::SpaceShip()
+GameObject::GameObject()
+{
+	x = 0;
+	y = 0;
+
+	velX = 0;
+	velY = 0;
+
+	dirX = 0;
+	dirY = 0;
+
+	boundX = 0;
+	boundY = 0;
+
+	maxFrame = 0;
+	curFrame = 0;
+	frameCount = 0;
+	frameDelay = 0;
+	frameWidth = 0;
+	frameHeight = 0;
+	animationColumns = 0;
+	animationDirection = 0;
+
+	image = NULL;
+
+	alive = true;
+	collidable = true;
+}
+
+void GameObject::Destroy()
+{
+
+}
+
+void GameObject::Init(float x, float y, float velX, float velY, int dirX, int dirY, int boundX, int boundY)
+{
+	GameObject::x = x;
+	GameObject::y = y;
+
+	GameObject::velX = velX;
+	GameObject::velY = velY;
+
+	GameObject::dirX = dirX;
+	GameObject::dirY = dirY;
+
+	GameObject::boundX = boundX;
+	GameObject::boundY = boundY;
+}
+
+void GameObject::Update()
+{
+	x += velX * dirX;
+	y += velY * dirY;
+}
+
+void GameObject::Render()
 {}
 
-void SpaceShip::Destroy()
+bool GameObject::CheckCollisions(GameObject *otherObject)
 {
-	GameObject::Destroy();
-}
+	float oX = otherObject->GetX();
+	float oY = otherObject->GetY();
 
-void SpaceShip::Init(ALLEGRO_BITMAP *image)
-{
-	GameObject::Init(20, 200, 6, 6, 0, 0, 10, 12);
+	int obX = otherObject->GetBoundX();
+	int obY = otherObject->GetBoundY();
 
-	SetID(PLAYER);
-	SetAlive(true);
-
-	lives = 3;
-	score = 0;
-
-	maxFrame = 3;
-	curFrame = 0;
-	frameWidth = 46;
-	frameHeight = 41;
-	animationColumns = 3;
-	animationDirection = 1;
-
-	animationRow = 1;
-
-	if (image != NULL)
-		SpaceShip::image = image;
-}
-
-
-void SpaceShip::Update()
-{
-	GameObject::Update();
-	if (x < 0)
-		x = 0;
-	else if (x > WIDTH)
-		x = WIDTH;
-
-	if (y < 0)
-		y = 0;
-	else if (y > HEIGHT)
-		y = HEIGHT;
-}
-
-void SpaceShip::Render()
-{
-	GameObject::Render();
-
-	int fx = (curFrame % animationColumns) * frameWidth;
-	int fy = animationRow * frameHeight;
-
-	al_draw_bitmap_region(image, fx, fy, frameWidth, frameHeight,
-		x - frameWidth / 2, y - frameHeight / 2, 0);
-}
-
-void SpaceShip::MoveUp()
-{
-	animationRow = 0;
-	dirY = -1;
-}
-void SpaceShip::MoveDown()
-{
-	animationRow = 2;
-	dirY = 1;
-}
-void SpaceShip::MoveLeft()
-{
-	curFrame = 2;
-	dirX = -1;
-}
-void SpaceShip::MoveRight()
-{
-	curFrame = 1;
-	dirX = 1;
-}
-
-void SpaceShip::ResetAnimation(int position)
-{
-	if (position == 1)
-	{
-		animationRow = 1;
-		dirY = 0;
-	}
+	if (x + boundX > oX - obX &&
+		x - boundX < oX + obX &&
+		y + boundY > oY - obY &&
+		y - boundY < oY + obY)
+		return true;
 	else
-	{
-		curFrame = 0;
-		dirX = 0;
-	}
+		return false;
 }
 
-void SpaceShip::Collided(int objectID)
+void GameObject::Collided(int objectID)
+{}
+
+bool GameObject::Collidable()
 {
-	if (objectID == ENEMY || objectID == BULLET)
-		lives--;
+	return alive && collidable;
 }
